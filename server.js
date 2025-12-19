@@ -5,20 +5,17 @@ const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Kết nối PostgreSQL
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'qlch24h_db',
-  password: '3112005', 
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
 // Cấu hình session để lưu thông tin đăng nhập
 app.use(session({
-  secret: 'qlch24h_super_secret_key_2025',  
+  secret: process.env.SESSION_SECRET || 'qlch24h_super_secret_key_2025',  
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 60 * 60 * 1000 } 
