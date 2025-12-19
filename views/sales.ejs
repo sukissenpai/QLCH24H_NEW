@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lập hóa đơn bán hàng - Cửa hàng 24h</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2"
+    as="font" type="font/woff2" crossorigin>
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Segoe UI', sans-serif;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 280px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding-top: 2rem;
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+
+    .sidebar .logo {
+      text-align: center;
+      margin-bottom: 3rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+
+    .sidebar .logo:hover {
+      opacity: 0.8;
+    }
+
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      padding: 0.9rem 1.5rem;
+      border-radius: 0 50px 50px 0;
+      margin: 0.3rem 1rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar .nav-link i {
+      font-size: 1.3rem;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .sidebar .nav-link:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      margin-left: 0.5rem;
+    }
+
+    .sidebar .nav-link.active {
+      background: rgba(255, 255, 255, 0.3) !important;
+      color: white !important;
+      margin-left: 0.5rem;
+      font-weight: 600;
+      border-left: 4px solid #fff;
+    }
+
+    .content {
+      margin-left: 280px;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem;
+    }
+
+    .page-title {
+      color: #667eea;
+      font-weight: 700;
+      font-size: 2rem;
+    }
+
+    .quantity-input {
+      width: 100px;
+    }
+
+    .total-amount {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    #qrCodeContainer {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #qrCodeContainer img {
+      max-width: 300px;
+      border: 10px solid white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal {
+      z-index: 11000 !important;
+    }
+
+    .modal-backdrop {
+      display: none !important;
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 80px;
+      }
+
+      .sidebar .logo span {
+        display: none;
+      }
+
+      .sidebar .nav-text {
+        display: none;
+      }
+
+      .sidebar .nav-link {
+        padding: 1rem 0;
+        justify-content: center;
+        margin: 0.5rem auto;
+        border-radius: 50%;
+      }
+
+      .sidebar .nav-link i {
+        font-size: 1.5rem;
+      }
+
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active {
+        margin-left: 0;
+        border-left: none;
+      }
+
+      .content {
+        margin-left: 80px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="pageLoader"
+    style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(102,87,163,0.95);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:1;transition:opacity 0.5s;">
+    <div class="text-center">
+      <i class="fas fa-store-alt fa-4x text-white mb-4"></i>
+      <h4 class="text-white mb-3">Cửa hàng 24h</h4>
+      <div class="spinner-border text-white" style="width:4rem;height:4rem;" role="status"></div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="logo" onclick="window.location.href='/dashboard'">
+      <i class="fas fa-store-alt fa-2x"></i><span> 24H Store</span>
+    </div>
+    <nav class="nav flex-column">
+      <a class="nav-link" href="/dashboard"><i class="fas fa-home fa-lg"></i><span class="nav-text"> Trang
+          chủ</span></a>
+      <a class="nav-link" href="/products"><i class="fas fa-box fa-lg"></i><span class="nav-text">Sản phẩm</span></a>
+      <a class="nav-link" href="/inventory"><i class="fas fa-warehouse fa-lg"></i><span class="nav-text">Tồn
+          kho</span></a>
+      <% if (typeof role !=='undefined' && role==='admin' ) { %>
+        <a class="nav-link" href="/employees"><i class="fas fa-users-cog fa-lg"></i><span class="nav-text">Nhân
+            viên</span></a>
+        <% } %>
+          <a class="nav-link active" href="/sales"><i class="fas fa-cash-register fa-lg"></i><span class="nav-text">Bán
+              hàng</span></a>
+          <a class="nav-link" href="/reports"><i class="fas fa-chart-bar fa-lg"></i><span class="nav-text">Báo
+              cáo</span></a>
+          <hr class="my-4 opacity-50">
+          <a class="nav-link text-danger" href="/"><i class="fas fa-sign-out-alt fa-lg"></i><span class="nav-text">Đăng
+              xuất</span></a>
+    </nav>
+  </div>
+
+  <div class="content">
+    <div class="glass-card">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title"><i class="fas fa-cash-register me-3"></i>Lập hóa đơn bán hàng</h2>
+        <div class="text-end">
+          <span class="badge bg-primary fs-5 px-4 py-2">
+            <%= typeof username !=='undefined' ? username : 'Guest' %>
+          </span>
+          <small class="d-block text-muted fw-bold">
+            <%= typeof role !=='undefined' ? role.toUpperCase() : 'STAFF' %>
+          </small>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <h4><i class="fas fa-shopping-cart me-2"></i>Danh sách sản phẩm</h4>
+          <div class="table-responsive">
+            <table class="table table-hover" id="productTable">
+              <thead class="table-success">
+                <tr>
+                  <th>Sản phẩm</th>
+                  <th>Giá</th>
+                  <th>Tồn kho</th>
+                  <th>Số lượng mua</th>
+                  <th>Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (products && products.length> 0) { %>
+                  <% products.forEach(p=> { %>
+                    <tr data-price="<%= p.price %>" data-stock="<%= p.stock %>">
+                      <td><strong>
+                          <%= p.name %>
+                        </strong></td>
+                      <td>
+                        <%= Number(p.price).toLocaleString('vi-VN') %> VNĐ
+                      </td>
+                      <td><span class="badge bg-info">
+                          <%= p.stock %>
+                        </span></td>
+                      <td>
+                        <input type="number" class="form-control quantity-input quantity" min="0" max="<%= p.stock %>"
+                          value="0" data-id="<%= p.id %>">
+                      </td>
+                      <td class="subtotal">0 VNĐ</td>
+                    </tr>
+                    <% }) %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="5" class="text-center text-muted">Chưa có sản phẩm</td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card border-primary h-100">
+            <div class="card-header bg-primary text-white text-center">
+              <h5><i class="fas fa-credit-card me-2"></i>Thanh toán</h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <div class="mb-4">
+                <h4>Tổng tiền:</h4>
+                <h2 class="total-amount text-danger" id="totalAmount">0 VNĐ</h2>
+              </div>
+
+              <select class="form-select mb-4" id="paymentMethod">
+                <option value="momo">Momo</option>
+                <option value="vnpay">VN Pay</option>
+                <option value="cod">COD (Thu hộ)</option>
+              </select>
+
+              <button class="btn btn-warning btn-lg mt-auto" data-bs-toggle="modal" data-bs-target="#confirmModal">
+                <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận thanh toán
+              </button>
+
+              <div class="modal fade" id="confirmModal" tabindex="-1" data-bs-backdrop="false">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                      <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Xác nhận thanh toán</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p>Bạn có chắc chắn muốn hoàn tất thanh toán?</p>
+                      <p><strong>Tổng tiền: <span id="modalTotal">0 VNĐ</span></strong></p>
+                      <p>Sau khi xác nhận:</p>
+                      <ul>
+                        <li>Tồn kho sản phẩm sẽ được giảm.</li>
+                        <li>Doanh thu sẽ được cập nhật trong báo cáo.</li>
+                      </ul>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                      <button type="button" class="btn btn-success" id="finalPayButton">
+                        <i class="fas fa-check me-2"></i>Đồng ý thanh toán
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- QR Code container -->
+              <div id="qrCodeContainer" class="mt-4" style="display: none;">
+                <h5 class="text-primary mb-3">Quét QR để thanh toán</h5>
+                <img id="qrImage" src="" alt="QR Code thanh toán">
+                <p class="mt-3 text-muted">Số tiền: <strong id="qrAmount">0 VNĐ</strong></p>
+                <p class="text-muted">Nội dung: Thanh toán đơn hàng Cửa hàng 24h</p>
+              </div>
+
+              <!-- COD message -->
+              <div id="codMessage" class="mt-4 text-center" style="display: none;">
+                <i class="fas fa-truck fa-4x text-success mb-3"></i>
+                <h5>Đơn hàng COD đã được xác nhận!</h5>
+                <p>Khách hàng sẽ thanh toán khi nhận hàng.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const quantityInputs = document.querySelectorAll('.quantity');
+      const totalAmountEl = document.getElementById('totalAmount');
+      const modalTotal = document.getElementById('modalTotal');
+      const finalPayButton = document.getElementById('finalPayButton');
+      const paymentMethod = document.getElementById('paymentMethod');
+      const qrContainer = document.getElementById('qrCodeContainer');
+      const qrImage = document.getElementById('qrImage');
+      const qrAmount = document.getElementById('qrAmount');
+      const codMessage = document.getElementById('codMessage');
+
+      function calculateTotal() {
+        let total = 0;
+        const items = [];
+        document.querySelectorAll('#productTable tbody tr').forEach(row => {
+          const price = parseInt(row.getAttribute('data-price')) || 0;
+          const quantityInput = row.querySelector('.quantity');
+          const quantity = parseInt(quantityInput.value) || 0;
+          const productId = quantityInput.getAttribute('data-id');
+          const subtotal = price * quantity;
+          row.querySelector('.subtotal').textContent = subtotal.toLocaleString('vi-VN') + ' VNĐ';
+          total += subtotal;
+          if (quantity > 0) {
+            items.push({ id: productId, quantity: quantity });
+          }
+        });
+        totalAmountEl.textContent = total.toLocaleString('vi-VN') + ' VNĐ';
+        modalTotal.textContent = total.toLocaleString('vi-VN') + ' VNĐ';
+        return { total, items };
+      }
+
+      function updatePaymentDisplay() {
+        const { total } = calculateTotal();
+        const method = paymentMethod.value;
+
+        qrContainer.style.display = 'none';
+        codMessage.style.display = 'none';
+
+        if (total === 0) {
+          return; 
+        }
+
+        if (method === 'cod') {
+          codMessage.style.display = 'block';
+        } else {
+          qrContainer.style.display = 'block';
+          qrAmount.textContent = total.toLocaleString('vi-VN') + ' VNĐ';
+          if (method === 'momo') {
+            qrImage.src = 'https://img.vietqr.io/image/momo-0918901935-compact.png' + total + '&addInfo=Thanh%20toan%20don%20hang';
+          } else {
+            qrImage.src = 'https://img.vietqr.io/image/MB-0918901935-compact.png' + total + '&addInfo=Thanh%20toan%20don%20hang';
+          }
+        }
+      }
+
+      quantityInputs.forEach(input => {
+        input.addEventListener('input', function () {
+          const max = parseInt(this.getAttribute('max'));
+          if (this.value > max) this.value = max;
+          if (this.value < 0) this.value = 0;
+          calculateTotal();
+          updatePaymentDisplay();
+        });
+      });
+
+      paymentMethod.addEventListener('change', updatePaymentDisplay);
+
+      // cập nhật tổng tiền
+      const confirmModal = document.getElementById('confirmModal');
+      confirmModal.addEventListener('show.bs.modal', calculateTotal);
+
+      finalPayButton.addEventListener('click', function () {
+        console.log('Nút Đồng ý thanh toán được click!');  
+        const { total, items } = calculateTotal();
+        const method = paymentMethod.value;
+
+        if (total === 0) {
+          alert('Vui lòng chọn ít nhất một sản phẩm!');
+          return;
+        }
+
+        // giảm tồn kho và cập nhật doanh thu
+        fetch('/sales/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: items, total: total, payment_method: method })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert(data.message);
+              // Reset giỏ hàng
+              quantityInputs.forEach(input => input.value = 0);
+              calculateTotal();
+              updatePaymentDisplay();  
+
+              // Đóng modal
+              bootstrap.Modal.getInstance(confirmModal).hide();
+            } else {
+              alert('Lỗi: ' + data.message);
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            alert('Lỗi kết nối server');
+          });
+      });
+
+      // Highlight menu
+      const currentPath = window.location.pathname;
+      document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        }
+      });
+
+      document.body.style.opacity = '1';
+    });
+
+    window.addEventListener('load', function () {
+      const loader = document.getElementById('pageLoader');
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 500);
+    });
+
+    // Thêm timeout 
+    setTimeout(function () {
+      const loader = document.getElementById('pageLoader');
+      if (loader) {
+        loader.style.display = 'none';
+      }
+    }, 3000);  
+  </script>
+</body>
+
+</html>

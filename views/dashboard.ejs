@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Cửa hàng 24h</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 280px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding-top: 2rem;
+      z-index: 1000;
+    }
+
+    .sidebar .logo {
+      text-align: center;
+      margin-bottom: 3rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      padding: 0.9rem 1.5rem;
+      border-radius: 0 50px 50px 0;
+      margin: 0.3rem 1rem;
+      transition: all 0.3s;
+    }
+
+    .sidebar .nav-link:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      margin-left: 0.5rem;
+    }
+
+    .content {
+      margin-left: 280px;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      text-align: center;
+    }
+
+    .welcome-icon {
+      font-size: 5rem;
+      color: #667eea;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 80px;
+      }
+
+      .sidebar .logo span,
+      .sidebar .nav-text {
+        display: none;
+      }
+
+      .content {
+        margin-left: 80px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="logo" style="cursor: pointer;" onclick="window.location.href='/dashboard'">
+      <i class="fas fa-store-alt fa-2x"></i><span> 24H Store</span>
+    </div>
+    <nav class="nav flex-column">
+      <a class="nav-link" href="/dashboard"><i class="fas fa-home fa-lg me-3"></i><span class="nav-text">Trang
+          chủ</span></a>
+      <a class="nav-link" href="/products"><i class="fas fa-box fa-lg me-3"></i><span class="nav-text">Sản
+          phẩm</span></a>
+      <a class="nav-link" href="/inventory"><i class="fas fa-warehouse fa-lg me-3"></i><span class="nav-text">Tồn
+          kho</span></a>
+      <a class="nav-link" href="/employees"><i class="fas fa-users-cog fa-lg me-3"></i><span class="nav-text">Nhân
+          viên</span></a>
+      <a class="nav-link" href="/sales"><i class="fas fa-cash-register fa-lg me-3"></i><span class="nav-text">Bán
+          hàng</span></a>
+      <a class="nav-link" href="/reports"><i class="fas fa-chart-bar fa-lg me-3"></i><span class="nav-text">Báo
+          cáo</span></a>
+      <hr class="my-4 opacity-50">
+      <a class="nav-link text-danger" href="/"><i class="fas fa-sign-out-alt fa-lg me-3"></i><span class="nav-text">Đăng
+          xuất</span></a>
+    </nav>
+  </div>
+
+  <div class="content">
+    <div class="glass-card">
+      <i class="fas fa-tachometer-alt welcome-icon"></i>
+      <h1 class="display-4 text-primary mb-4">Chào mừng đến với hệ thống!</h1>
+      <h3>Xin chào <strong>
+          <%= typeof username !=='undefined' ? username : 'Guest' %>
+        </strong> (<%= typeof role !=='undefined' ? role.toUpperCase() : 'STAFF' %>)</h3>
+      <p class="lead mt-4">Hệ thống quản lý cửa hàng 24h đã sẵn sàng. Hãy chọn chức năng từ menu bên trái để bắt đầu.
+      </p>
+      <hr class="my-5">
+      <div class="row text-center">
+        <div class="col-md-4">
+          <i class="fas fa-box fa-3x text-primary mb-3"></i>
+          <h5>Quản lý sản phẩm & tồn kho</h5>
+        </div>
+        <div class="col-md-4">
+          <i class="fas fa-cash-register fa-3x text-success mb-3"></i>
+          <h5>Lập hóa đơn bán hàng</h5>
+        </div>
+        <div class="col-md-4">
+          <i class="fas fa-chart-bar fa-3x text-info mb-3"></i>
+          <h5>Xem báo cáo doanh thu</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
